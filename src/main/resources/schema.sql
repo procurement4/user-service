@@ -1,0 +1,19 @@
+---- public."User" definition
+--
+---- Drop table
+--
+---- DROP TABLE "User";
+--
+--CREATE TABLE "User" (
+--	id integer NOT NULL,
+--	"name" varchar NOT NULL,
+--	email varchar NOT NULL,
+--	rolename varchar NOT NULL,
+--	"password" varchar NOT NULL,
+--	"photoProfile" varchar(255) NOT NULL,
+--	"isActive" bool NOT NULL DEFAULT false,
+--	"createdAt" date NULL,
+--	"updatedAt" date NULL,
+--	CONSTRAINT user_email_key UNIQUE (email),
+--	CONSTRAINT user_pkey PRIMARY KEY (id)
+--);
