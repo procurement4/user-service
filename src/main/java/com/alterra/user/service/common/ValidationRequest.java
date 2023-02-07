@@ -1,6 +1,5 @@
 package com.alterra.user.service.common;
 
-import com.alterra.user.service.users.model.UserRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;
@@ -36,7 +35,6 @@ public class ValidationRequest<T> {
         if (violations.size() > 0) {
             for (ConstraintViolation<T> violation : violations) {
                 errMsg.add(violation.getMessage());
-                //errMsg += " | " + violation.getMessage();
             }
         }
         return errMsg;
