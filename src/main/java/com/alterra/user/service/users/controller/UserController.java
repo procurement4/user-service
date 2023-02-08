@@ -19,7 +19,6 @@ import java.util.UUID;
 @Slf4j
 public class UserController {
     private final UserService userService;
-    private final Gson gson;
     @Value("${BASE_URL}")
     private String BASE_URL;
     @Value("[auth-service]")
@@ -33,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping("/v1/users/{userId}")
-    public ResponseEntity getUserById(@PathVariable UUID userId){
+    public ResponseEntity getUserById(@PathVariable String userId){
         log.info(String.format("%s GET : %s /api/v1/users/{userId} is called", SERVICE_NAME, BASE_URL));
         var result = userService.getUserById(userId);
         return ResponseEntity.status(result.getCode()).body(result);

@@ -73,10 +73,11 @@ public class UserServiceImpl implements UserService{
         }
     }
 
-    public ResponseAPI getUserById(UUID userId){
+    public ResponseAPI getUserById(String userId){
         try {
             log.info(String.format("%s userService.getUserById is called", SERVICE_NAME));
-            var getUserById = userRepositoryJPA.findById(userId);
+            var id = UUID.fromString(userId);
+            var getUserById = userRepositoryJPA.findById(id);
             var data = modelMapper.map(getUserById, UserResponse.class);
             log.info(String.format("%s Result : %s", SERVICE_NAME, new Gson().toJson(data)));
             if (getUserById.isEmpty()) return responseAPI.NOT_FOUND("User not found", null);
@@ -131,12 +132,12 @@ public class UserServiceImpl implements UserService{
     public ResponseAPI updateUser(UserRequest request){
         try {
             //Validate request
+            var id = UUID.fromString(request.getId());
             var validate = new ValidationRequest(request).validate();
             if (validate.size() > 0) return responseAPI.BAD_REQUEST(validate.toString(), null);
 
             //Check data exist
-            var getUserById = userRepositoryJPA.findById(request.getId());
-            if (getUserById.isEmpty()) return responseAPI.INTERNAL_SERVER_ERROR("User not found", null);
+            var getUserById = userRepositoryJPA.findById(id);
             if (getUserById.isEmpty()) return responseAPI.INTERNAL_SERVER_ERROR("User not found", null);
 
             var updatedUser = modelMapper.map(request, User.class);

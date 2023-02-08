@@ -13,7 +13,7 @@ public interface UserService {
     User findByEmail(String email);
 //    List<User> getAllUsers();
     ResponseAPI getAllUsers();
-    ResponseAPI getUserById(UUID userId);
+    ResponseAPI getUserById(String userId);
     ResponseAPI createUser(UserRequest request);
     ResponseAPI updateUser(UserRequest request);
     ResponseAPI uploadProfile(MultipartFile file);
