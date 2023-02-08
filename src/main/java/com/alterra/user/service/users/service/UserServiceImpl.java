@@ -1,23 +1,25 @@
 package com.alterra.user.service.users.service;
 
-import com.alterra.user.service.common.Json;
-import com.alterra.user.service.common.ResponseAPI;
-import com.alterra.user.service.common.ValidationRequest;
+import com.alterra.user.service.utils.FileUtils;
+import com.alterra.user.service.utils.ResponseAPI;
+import com.alterra.user.service.utils.ValidationRequest;
 import com.alterra.user.service.users.entity.User;
 import com.alterra.user.service.users.model.UploadImageResponse;
 import com.alterra.user.service.users.model.UserRequest;
 import com.alterra.user.service.users.model.UserResponse;
 import com.alterra.user.service.users.repository.UserRepositoryJPA;
+import com.google.cloud.storage.Acl;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -40,6 +42,15 @@ public class UserServiceImpl implements UserService{
     private String BASE_URL;
     @Value("[auth-service]")
     private String SERVICE_NAME;
+    @Value("${GCP_BUCKET_NAME}")
+    private String BUCKET_NAME;
+    @Value("${GCP_BUCKET_URL}")
+    private String BUCKET_URL;
+
+    private final FileUtils fileUtils;
+
+    private static Storage storage = StorageOptions.getDefaultInstance().getService();
+
     public User findByEmail(String email) {
         return userRepositoryJPA.findByEmail(email);
     }
@@ -149,12 +160,37 @@ public class UserServiceImpl implements UserService{
             StringBuilder fileNames = new StringBuilder();
             Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, file.getOriginalFilename());
             if (Files.notExists(Paths.get(UPLOAD_DIRECTORY))){
-                File newDirectory = new File(System.getProperty("user.dir"), "images");
+                java.io.File newDirectory = new java.io.File(System.getProperty("user.dir"), "images");
                 newDirectory.mkdir();
             }
             fileNames.append(fileNameAndPath);
             Files.write(fileNameAndPath, file.getBytes());
             var data = new UploadImageResponse(fileNameAndPath.toString());
+            return responseAPI.OK("Success upload image", data);
+        }catch (IOException ex){
+            var errMsg = String.format("Error Message : %s with Stacktrace : %s",ex.getMessage(),ex.getStackTrace());
+            log.error(String.format("%s" , errMsg));
+            return responseAPI.INTERNAL_SERVER_ERROR(errMsg,null);
+        }
+    }
+
+    public ResponseAPI saveImages(MultipartFile file){
+        try {
+            String fileName = System.nanoTime() + "_" + file.getOriginalFilename();
+            var isValidSize = fileUtils.checkImageSize(file);
+            var isValidExtension = fileUtils.checkFileExtension(file.getOriginalFilename());
+            if (!isValidSize) return responseAPI.BAD_REQUEST("Max size of image is 5MB",null);
+            if (!isValidExtension) return responseAPI.BAD_REQUEST("Extension must be .png, .jpeg, .jpg",null);
+
+            BlobInfo blobInfo = storage.create(
+                    BlobInfo.newBuilder(BUCKET_NAME, fileName)
+                            .setContentType(file.getContentType())
+                            .setAcl(new ArrayList<>(
+                                    Arrays.asList(Acl.of(Acl.User.ofAllUsers(),Acl.Role.READER))))
+                            .build(),
+                    file.getInputStream());
+            String imageUrl = BUCKET_URL + BUCKET_NAME + "/" + fileName;
+            var data = new UploadImageResponse(imageUrl);
             return responseAPI.OK("Success upload image", data);
         }catch (IOException ex){
             var errMsg = String.format("Error Message : %s with Stacktrace : %s",ex.getMessage(),ex.getStackTrace());

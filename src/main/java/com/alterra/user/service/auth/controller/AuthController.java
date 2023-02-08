@@ -1,6 +1,6 @@
 package com.alterra.user.service.auth.controller;
 
-import com.alterra.user.service.common.ResponseAPI;
+import com.alterra.user.service.utils.ResponseAPI;
 import com.alterra.user.service.auth.config.JwtUtils;
 import com.alterra.user.service.auth.model.AuthRequest;
 import com.alterra.user.service.auth.model.AuthResponse;

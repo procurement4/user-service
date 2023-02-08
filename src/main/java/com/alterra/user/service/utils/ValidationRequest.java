@@ -1,4 +1,4 @@
-package com.alterra.user.service.common;
+package com.alterra.user.service.utils;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
