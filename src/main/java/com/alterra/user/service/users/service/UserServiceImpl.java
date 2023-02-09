@@ -8,19 +8,17 @@ import com.alterra.user.service.users.model.UploadImageResponse;
 import com.alterra.user.service.users.model.UserRequest;
 import com.alterra.user.service.users.model.UserResponse;
 import com.alterra.user.service.users.repository.UserRepositoryJPA;
-import com.google.cloud.storage.Acl;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
+import com.google.auth.Credentials;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.*;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
-
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,17 +37,18 @@ public class UserServiceImpl implements UserService{
     private final ModelMapper modelMapper;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Value("${BASE_URL}")
-    private String BASE_URL;
+    private final String BASE_URL;
     @Value("[auth-service]")
-    private String SERVICE_NAME;
+    private final String SERVICE_NAME;
     @Value("${GCP_BUCKET_NAME}")
-    private String BUCKET_NAME;
+    private final String BUCKET_NAME;
     @Value("${GCP_BUCKET_URL}")
-    private String BUCKET_URL;
-
+    private final String BUCKET_URL;
+    @Value("${GCP_PROJECT_ID}")
+    private final String PROJECT_ID;
+    @Value("${GCP_CREDENTIALS}")
+    private final String GOOGLE_CREDENTIALS;
     private final FileUtils fileUtils;
-
-    private static Storage storage = StorageOptions.getDefaultInstance().getService();
 
     public User findByEmail(String email) {
         return userRepositoryJPA.findByEmail(email);
@@ -177,6 +176,11 @@ public class UserServiceImpl implements UserService{
 
     public ResponseAPI saveImages(MultipartFile file){
         try {
+            Credentials credentials = GoogleCredentials
+                    .fromStream(new FileInputStream(GOOGLE_CREDENTIALS));
+            Storage storage = StorageOptions.newBuilder().setCredentials(credentials)
+                    .setProjectId(PROJECT_ID).build().getService();
+
             String fileName = System.nanoTime() + "_" + file.getOriginalFilename();
             var isValidSize = fileUtils.checkImageSize(file);
             var isValidExtension = fileUtils.checkFileExtension(file.getOriginalFilename());

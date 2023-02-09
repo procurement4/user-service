@@ -41,7 +41,14 @@ public class SecurityConfig {
                 .cors().disable()
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api","/api/v1/register","/api/v1/auth/**", "/swagger-ui/**" ,"/api-docs/**")
+                .requestMatchers(
+                                "api/v1/upload/gcp",
+                                "/api",
+                                "/api/v1/register",
+                                "/api/v1/auth/**",
+                                "/swagger-ui/**",
+                                "/api-docs/**"
+                )
                 .permitAll()
                 .anyRequest()
                 .authenticated()

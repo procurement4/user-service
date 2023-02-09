@@ -20,9 +20,9 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     @Value("${BASE_URL}")
-    private String BASE_URL;
+    private final String BASE_URL;
     @Value("[auth-service]")
-    private String SERVICE_NAME;
+    private final String SERVICE_NAME;
 
     @GetMapping("/v1/users")
     public ResponseEntity getAllUsers(){
@@ -55,6 +55,7 @@ public class UserController {
         var result = userService.uploadProfile(file);
         return ResponseEntity.status(result.getCode()).body(result);
     }
+
     @PostMapping("/v1/upload/gcp")
     public ResponseEntity uploadGCP(@RequestParam("image") MultipartFile file) {
         var result = userService.saveImages(file);
