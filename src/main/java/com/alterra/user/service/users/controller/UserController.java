@@ -20,9 +20,9 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     @Value("${BASE_URL}")
-    private final String BASE_URL;
+    private String BASE_URL;
     @Value("[auth-service]")
-    private final String SERVICE_NAME;
+    private String SERVICE_NAME;
 
     @GetMapping("/v1/users")
     public ResponseEntity getAllUsers(){

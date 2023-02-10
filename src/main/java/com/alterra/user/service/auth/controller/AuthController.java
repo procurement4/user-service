@@ -1,5 +1,6 @@
 package com.alterra.user.service.auth.controller;
 
+import com.alterra.user.service.users.repository.UserRepositoryJPA;
 import com.alterra.user.service.utils.ResponseAPI;
 import com.alterra.user.service.auth.config.JwtUtils;
 import com.alterra.user.service.auth.model.AuthRequest;
@@ -14,11 +15,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
+    private final UserRepositoryJPA userRepositoryJPA;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final ResponseAPI responseAPI;
@@ -40,8 +44,13 @@ public class AuthController {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
-            var token = new AuthResponse(jwtUtils.generateToken(request.getEmail()));
-            return new ResponseEntity(responseAPI.OK("Success authentication", token), HttpStatus.OK);
+            var getUserByEmail = userRepositoryJPA.findByEmail("admin@gmail.com");
+            if (getUserByEmail == null) return new ResponseEntity(responseAPI.BAD_REQUEST("Email not found", null), HttpStatus.BAD_REQUEST);
+            if (getUserByEmail.getIs_active().equals(false)) return new ResponseEntity(responseAPI.BAD_REQUEST("Please verification your account", null), HttpStatus.BAD_REQUEST);
+            var data = new AuthResponse();
+            data.setToken(jwtUtils.generateToken(request.getEmail()));
+            data.setUser_id(getUserByEmail.getId().toString());
+            return new ResponseEntity(responseAPI.OK("Success authentication", data), HttpStatus.OK);
         }catch (Exception ex){
             log.error(String.format("%s Exception : Invalid email and password", SERVICE_NAME));
             return new ResponseEntity(responseAPI.BAD_REQUEST("Invalid email and password", null), HttpStatus.BAD_REQUEST);

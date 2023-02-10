@@ -37,17 +37,17 @@ public class UserServiceImpl implements UserService{
     private final ModelMapper modelMapper;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Value("${BASE_URL}")
-    private final String BASE_URL;
+    private String BASE_URL;
     @Value("[auth-service]")
-    private final String SERVICE_NAME;
+    private String SERVICE_NAME;
     @Value("${GCP_BUCKET_NAME}")
-    private final String BUCKET_NAME;
+    private String BUCKET_NAME;
     @Value("${GCP_BUCKET_URL}")
-    private final String BUCKET_URL;
+    private String BUCKET_URL;
     @Value("${GCP_PROJECT_ID}")
-    private final String PROJECT_ID;
+    private String PROJECT_ID;
     @Value("${GCP_CREDENTIALS}")
-    private final String GOOGLE_CREDENTIALS;
+    private String GOOGLE_CREDENTIALS;
     private final FileUtils fileUtils;
 
     public User findByEmail(String email) {
