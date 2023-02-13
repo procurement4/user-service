@@ -1,24 +1,24 @@
 package com.alterra.user.service.users.service;
 
-import com.alterra.user.service.common.Json;
-import com.alterra.user.service.common.ResponseAPI;
-import com.alterra.user.service.common.ValidationRequest;
+import com.alterra.user.service.utils.FileUtils;
+import com.alterra.user.service.utils.ResponseAPI;
+import com.alterra.user.service.utils.ValidationRequest;
 import com.alterra.user.service.users.entity.User;
 import com.alterra.user.service.users.model.UploadImageResponse;
 import com.alterra.user.service.users.model.UserRequest;
 import com.alterra.user.service.users.model.UserResponse;
 import com.alterra.user.service.users.repository.UserRepositoryJPA;
+import com.google.auth.Credentials;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.*;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
-
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
-import java.util.UUID;
-
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +40,16 @@ public class UserServiceImpl implements UserService{
     private String BASE_URL;
     @Value("[auth-service]")
     private String SERVICE_NAME;
+    @Value("${GCP_BUCKET_NAME}")
+    private String BUCKET_NAME;
+    @Value("${GCP_BUCKET_URL}")
+    private String BUCKET_URL;
+    @Value("${GCP_PROJECT_ID}")
+    private String PROJECT_ID;
+    @Value("${GCP_CREDENTIALS}")
+    private String GOOGLE_CREDENTIALS;
+    private final FileUtils fileUtils;
+
     public User findByEmail(String email) {
         return userRepositoryJPA.findByEmail(email);
     }
@@ -62,10 +72,11 @@ public class UserServiceImpl implements UserService{
         }
     }
 
-    public ResponseAPI getUserById(UUID userId){
+    public ResponseAPI getUserById(String userId){
         try {
             log.info(String.format("%s userService.getUserById is called", SERVICE_NAME));
-            var getUserById = userRepositoryJPA.findById(userId);
+            var id = UUID.fromString(userId);
+            var getUserById = userRepositoryJPA.findById(id);
             var data = modelMapper.map(getUserById, UserResponse.class);
             log.info(String.format("%s Result : %s", SERVICE_NAME, new Gson().toJson(data)));
             if (getUserById.isEmpty()) return responseAPI.NOT_FOUND("User not found", null);
@@ -120,12 +131,12 @@ public class UserServiceImpl implements UserService{
     public ResponseAPI updateUser(UserRequest request){
         try {
             //Validate request
+            var id = UUID.fromString(request.getId());
             var validate = new ValidationRequest(request).validate();
             if (validate.size() > 0) return responseAPI.BAD_REQUEST(validate.toString(), null);
 
             //Check data exist
-            var getUserById = userRepositoryJPA.findById(request.getId());
-            if (getUserById.isEmpty()) return responseAPI.INTERNAL_SERVER_ERROR("User not found", null);
+            var getUserById = userRepositoryJPA.findById(id);
             if (getUserById.isEmpty()) return responseAPI.INTERNAL_SERVER_ERROR("User not found", null);
 
             var updatedUser = modelMapper.map(request, User.class);
@@ -149,12 +160,42 @@ public class UserServiceImpl implements UserService{
             StringBuilder fileNames = new StringBuilder();
             Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, file.getOriginalFilename());
             if (Files.notExists(Paths.get(UPLOAD_DIRECTORY))){
-                File newDirectory = new File(System.getProperty("user.dir"), "images");
+                java.io.File newDirectory = new java.io.File(System.getProperty("user.dir"), "images");
                 newDirectory.mkdir();
             }
             fileNames.append(fileNameAndPath);
             Files.write(fileNameAndPath, file.getBytes());
             var data = new UploadImageResponse(fileNameAndPath.toString());
+            return responseAPI.OK("Success upload image", data);
+        }catch (IOException ex){
+            var errMsg = String.format("Error Message : %s with Stacktrace : %s",ex.getMessage(),ex.getStackTrace());
+            log.error(String.format("%s" , errMsg));
+            return responseAPI.INTERNAL_SERVER_ERROR(errMsg,null);
+        }
+    }
+
+    public ResponseAPI saveImages(MultipartFile file){
+        try {
+            Credentials credentials = GoogleCredentials
+                    .fromStream(new FileInputStream(GOOGLE_CREDENTIALS));
+            Storage storage = StorageOptions.newBuilder().setCredentials(credentials)
+                    .setProjectId(PROJECT_ID).build().getService();
+
+            String fileName = System.nanoTime() + "_" + file.getOriginalFilename();
+            var isValidSize = fileUtils.checkImageSize(file);
+            var isValidExtension = fileUtils.checkFileExtension(file.getOriginalFilename());
+            if (!isValidSize) return responseAPI.BAD_REQUEST("Max size of image is 5MB",null);
+            if (!isValidExtension) return responseAPI.BAD_REQUEST("Extension must be .png, .jpeg, .jpg",null);
+
+            BlobInfo blobInfo = storage.create(
+                    BlobInfo.newBuilder(BUCKET_NAME, fileName)
+                            .setContentType(file.getContentType())
+                            .setAcl(new ArrayList<>(
+                                    Arrays.asList(Acl.of(Acl.User.ofAllUsers(),Acl.Role.READER))))
+                            .build(),
+                    file.getInputStream());
+            String imageUrl = BUCKET_URL + BUCKET_NAME + "/" + fileName;
+            var data = new UploadImageResponse(imageUrl);
             return responseAPI.OK("Success upload image", data);
         }catch (IOException ex){
             var errMsg = String.format("Error Message : %s with Stacktrace : %s",ex.getMessage(),ex.getStackTrace());

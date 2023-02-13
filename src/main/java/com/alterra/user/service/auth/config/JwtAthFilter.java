@@ -1,6 +1,5 @@
 package com.alterra.user.service.auth.config;
 
-import com.alterra.user.service.auth.config.JwtUtils;
 import com.alterra.user.service.auth.service.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

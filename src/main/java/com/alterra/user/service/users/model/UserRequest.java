@@ -5,14 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
+import org.hibernate.validator.constraints.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRequest {
-    UUID id;
+    String id;
     @NotBlank(message = "name must not be blank")
     String name;
     @NotBlank(message = "rolename must not be blank")

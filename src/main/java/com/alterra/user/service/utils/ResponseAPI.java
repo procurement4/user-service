@@ -1,11 +1,10 @@
-package com.alterra.user.service.common;
+package com.alterra.user.service.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component
 @NoArgsConstructor

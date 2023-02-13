@@ -1,7 +1,6 @@
 package com.alterra.user.service.auth.config;
 
 import com.alterra.user.service.auth.service.AuthService;
-import com.alterra.user.service.exception.RestResponseEntityExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -41,7 +41,14 @@ public class SecurityConfig {
                 .cors().disable()
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/register","/api/v1/auth/**", "/swagger-ui/**" ,"/api-docs/**")
+                .requestMatchers(
+                                "api/v1/upload/gcp",
+                                "/api",
+                                "/api/v1/register",
+                                "/api/v1/auth/**",
+                                "/swagger-ui/**",
+                                "/api-docs/**"
+                )
                 .permitAll()
                 .anyRequest()
                 .authenticated()
@@ -72,8 +79,8 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-        //return new BCryptPasswordEncoder();
+        //return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
