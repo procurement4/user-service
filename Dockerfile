@@ -9,6 +9,6 @@ RUN gradle clean build
 
 FROM gradle:jdk17-alpine
 WORKDIR /home/application/java
-COPY --from=compile "/home/source/java/build/libs/user.service-0.0.1-SNAPSHOT.jar" .
+COPY --from=compile "/home/source/java/build/libs/user-service-0.0.1-SNAPSHOT.jar" .
 EXPOSE 8080
-ENTRYPOINT [ "java", "-jar", "/home/application/java/user.service-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT [ "java", "-jar", "/home/application/java/user-service-0.0.1-SNAPSHOT.jar"]
