@@ -1,4 +1,4 @@
-package com.alterra.user.service.auth.config;
+package com.alterra.user.service.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

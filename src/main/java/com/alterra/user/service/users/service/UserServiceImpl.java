@@ -1,5 +1,7 @@
 package com.alterra.user.service.users.service;
 
+import com.alterra.user.service.users.model.ResetPasswordRequest;
+import com.alterra.user.service.utils.Email;
 import com.alterra.user.service.utils.FileUtils;
 import com.alterra.user.service.utils.ResponseAPI;
 import com.alterra.user.service.utils.ValidationRequest;
@@ -20,9 +22,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -198,6 +203,25 @@ public class UserServiceImpl implements UserService{
             var data = new UploadImageResponse(imageUrl);
             return responseAPI.OK("Success upload image", data);
         }catch (IOException ex){
+            var errMsg = String.format("Error Message : %s with Stacktrace : %s",ex.getMessage(),ex.getStackTrace());
+            log.error(String.format("%s" , errMsg));
+            return responseAPI.INTERNAL_SERVER_ERROR(errMsg,null);
+        }
+    }
+
+    public ResponseAPI resetPassword(String userId){
+        try {
+            var id = UUID.fromString(userId);
+            var getUserById = userRepositoryJPA.findById(id);
+            if (getUserById.isEmpty()) return responseAPI.INTERNAL_SERVER_ERROR("User not found", null);
+            String newPassword = RandomStringUtils.randomAlphabetic(6);
+            var resetPasswordRequest = new ResetPasswordRequest();
+            resetPasswordRequest.setUser_id(userId);
+            resetPasswordRequest.setNew_password(newPassword);
+            resetPasswordRequest.setEmail("hendralw98@gmail.com");
+            userRepositoryJPA.resetPassword(passwordEncoder.encode(newPassword), new Date(), id);
+            return responseAPI.OK("Success reset password, please check your email at " + resetPasswordRequest.getEmail() , resetPasswordRequest);
+        }catch (Exception ex){
             var errMsg = String.format("Error Message : %s with Stacktrace : %s",ex.getMessage(),ex.getStackTrace());
             log.error(String.format("%s" , errMsg));
             return responseAPI.INTERNAL_SERVER_ERROR(errMsg,null);

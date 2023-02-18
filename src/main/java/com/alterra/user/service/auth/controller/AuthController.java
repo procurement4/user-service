@@ -2,7 +2,7 @@ package com.alterra.user.service.auth.controller;
 
 import com.alterra.user.service.users.repository.UserRepositoryJPA;
 import com.alterra.user.service.utils.ResponseAPI;
-import com.alterra.user.service.auth.config.JwtUtils;
+import com.alterra.user.service.config.JwtUtils;
 import com.alterra.user.service.auth.model.AuthRequest;
 import com.alterra.user.service.auth.model.AuthResponse;
 import com.google.gson.Gson;
@@ -14,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")

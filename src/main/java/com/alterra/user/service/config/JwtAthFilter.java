@@ -1,4 +1,4 @@
-package com.alterra.user.service.auth.config;
+package com.alterra.user.service.config;
 
 import com.alterra.user.service.auth.service.AuthService;
 import jakarta.servlet.FilterChain;

@@ -3,26 +3,35 @@ package com.alterra.user.service.users.controller;
 import com.alterra.user.service.users.model.UserRequest;
 import com.alterra.user.service.users.service.UserService;
 import com.google.gson.Gson;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/api")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @Slf4j
 public class UserController {
+    private static final String API_KEY = "3f7afc6d1e818f8646ea5363a29c9541-ca9eeb88-8fceec84";
+    private static final String YOUR_DOMAIN_NAME = "procurement-capstone.site";
     private final UserService userService;
     @Value("${BASE_URL}")
     private String BASE_URL;
     @Value("[auth-service]")
     private String SERVICE_NAME;
+
+    public UserController(UserService userService, KafkaTemplate<String, String> kafkaTemplate) {
+        this.userService = userService;
+        this.kafkaTemplate = kafkaTemplate;
+    }
+
+    private KafkaTemplate<String,String> kafkaTemplate;
 
     @GetMapping("/v1/users")
     public ResponseEntity getAllUsers(){
@@ -59,6 +68,16 @@ public class UserController {
     @PostMapping("/v1/upload/gcp")
     public ResponseEntity uploadGCP(@RequestParam("image") MultipartFile file) {
         var result = userService.saveImages(file);
-        return ResponseEntity.status(200).body(result);
+        return ResponseEntity.status(result.getCode()).body(result);
+    }
+
+    @GetMapping("/reset_password/{userId}")
+    public ResponseEntity resetPassword(@PathVariable String userId) {
+       var result = userService.resetPassword(userId);
+       if (result.getCode() == 200){
+           kafkaTemplate.send("resetPassword", new Gson().toJson(result.getData()));
+       }
+       result.setData(null);
+       return ResponseEntity.status(result.getCode()).body(result);
     }
 }

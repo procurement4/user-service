@@ -18,4 +18,5 @@ public interface UserService {
     ResponseAPI updateUser(UserRequest request);
     ResponseAPI uploadProfile(MultipartFile file);
     ResponseAPI saveImages(MultipartFile file);
+    ResponseAPI resetPassword(String userId);
 }

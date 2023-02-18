@@ -1,4 +1,4 @@
-package com.alterra.user.service.auth.config;
+package com.alterra.user.service.config;
 
 import com.alterra.user.service.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -24,7 +23,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 
 @Configuration
@@ -44,6 +42,7 @@ public class SecurityConfig {
                 .requestMatchers(
                                 "api/v1/upload/gcp",
                                 "/api",
+                                "/api/reset_password/**",
                                 "/api/v1/register",
                                 "/api/v1/auth/**",
                                 "/swagger-ui/**",
