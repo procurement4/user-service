@@ -75,4 +75,4 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/user-service:latest
             docker stop user-service
             docker rm user-service
-            docker run -d --restart unless-stopped --name user-service -p 8080:8080 -e SPRING.DATASOURCE.URL=jdbc:postgresql://${{ secrets.POSTGRES_HOST}}/postgres -e SPRING.DATASOURCE.USERNAME=${{ secrets.POSTGRES_USERNAME}} -e SPRING.DATASOURCE.PASSWORD=${{ secrets.POSTGRES_PASSWORD}} ${{ secrets.DOCKERHUB_USERNAME }}/user-service:latest
+            docker run -d --restart unless-stopped --name user-service -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/user-service:latest
