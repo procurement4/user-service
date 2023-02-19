@@ -50,6 +50,9 @@ public class UserController {
     @PostMapping("/v1/register")
     public ResponseEntity createUser(@RequestBody UserRequest request){
         var result = userService.createUser(request);
+        if (result.getCode() == 200){
+            kafkaTemplate.send("activateUser", new Gson().toJson(result.getData()));
+        }
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
@@ -84,6 +87,9 @@ public class UserController {
     @GetMapping("/v1/activate/{userId}")
     public ResponseEntity activateUser(@PathVariable String userId){
         var result = userService.activateUser(userId);
+        if (result.getCode() == 200){
+            return ResponseEntity.status(200).body("Your account is active now!");
+        }
         return ResponseEntity.status(result.getCode()).body(result);
     }
 }

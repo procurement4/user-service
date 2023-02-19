@@ -125,7 +125,8 @@ public class UserServiceImpl implements UserService{
 
             log.info(String.format("%s Data successfully created", SERVICE_NAME));
             var data = modelMapper.map(getUserById, UserResponse.class);
-            return responseAPI.CREATED("Success create new user", data);
+            data.setId(newUser.getId());
+            return responseAPI.OK("Success create new user", data);
         }catch (Exception ex){
             var errMsg = String.format("Error Message : %s with Stacktrace : %s",ex.getMessage(),ex.getStackTrace());
             log.error(String.format("%s" , errMsg));

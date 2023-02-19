@@ -42,7 +42,7 @@ public class AuthController {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
-            var getUserByEmail = userRepositoryJPA.findByEmail("admin@gmail.com");
+            var getUserByEmail = userRepositoryJPA.findByEmail(request.getEmail());
             if (getUserByEmail == null) return new ResponseEntity(responseAPI.BAD_REQUEST("Email not found", null), HttpStatus.BAD_REQUEST);
             if (getUserByEmail.getIs_active().equals(false)) return new ResponseEntity(responseAPI.BAD_REQUEST("Please verification your account", null), HttpStatus.BAD_REQUEST);
             var data = new AuthResponse();

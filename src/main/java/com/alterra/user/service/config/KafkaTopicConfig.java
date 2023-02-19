@@ -11,4 +11,9 @@ public class KafkaTopicConfig {
     public NewTopic resetPasswordTopic(){
         return TopicBuilder.name("resetPassword").build();
     }
+
+    @Bean
+    public NewTopic activateUser(){
+        return TopicBuilder.name("activateUser").build();
+    }
 }
