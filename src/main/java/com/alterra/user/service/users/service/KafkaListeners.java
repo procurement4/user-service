@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class KafkaListeners {
     private final Email email;
+
     @KafkaListener(topics = "resetPassword")
     public void subscribeResetPassword(String request){
         var objRequest = new Gson().fromJson(request, ResetPasswordRequest.class);
