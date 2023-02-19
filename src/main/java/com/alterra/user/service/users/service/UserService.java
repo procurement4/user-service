@@ -11,7 +11,6 @@ import java.util.UUID;
 
 public interface UserService {
     User findByEmail(String email);
-//    List<User> getAllUsers();
     ResponseAPI getAllUsers();
     ResponseAPI getUserById(String userId);
     ResponseAPI createUser(UserRequest request);
@@ -19,4 +18,5 @@ public interface UserService {
     ResponseAPI uploadProfile(MultipartFile file);
     ResponseAPI saveImages(MultipartFile file);
     ResponseAPI resetPassword(String userId);
+    ResponseAPI activateUser(String userId);
 }

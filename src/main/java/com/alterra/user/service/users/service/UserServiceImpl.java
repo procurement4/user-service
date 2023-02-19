@@ -227,4 +227,18 @@ public class UserServiceImpl implements UserService{
             return responseAPI.INTERNAL_SERVER_ERROR(errMsg,null);
         }
     }
+
+    public ResponseAPI activateUser(String userId){
+        try {
+            var id = UUID.fromString(userId);
+            var getUserById = userRepositoryJPA.findById(id);
+            if (getUserById.isEmpty()) return responseAPI.INTERNAL_SERVER_ERROR("User not found", null);
+            userRepositoryJPA.activateUser(id, new Date());
+            return responseAPI.OK("Success activate user", null);
+        }catch (Exception ex){
+            var errMsg = String.format("Error Message : %s with Stacktrace : %s",ex.getMessage(),ex.getStackTrace());
+            log.error(String.format("%s" , errMsg));
+            return responseAPI.INTERNAL_SERVER_ERROR(errMsg,null);
+        }
+    }
 }

@@ -18,4 +18,9 @@ public interface UserRepositoryJPA extends JpaRepository<User, UUID> {
     @Modifying
     @Query(value = "update users set password = :password, updated_at = :updated_at where id = :user_id", nativeQuery = true)
     void resetPassword(@Param("password") String password, @Param("updated_at") Date updated_at, @Param("user_id") UUID user_id);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update users set is_active = true, updated_at = :updated_at where id = :user_id", nativeQuery = true)
+    void activateUser(@Param("user_id") UUID user_id, @Param("updated_at") Date updated_at);
 }

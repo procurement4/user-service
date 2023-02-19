@@ -71,7 +71,7 @@ public class UserController {
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
-    @GetMapping("/reset_password/{userId}")
+    @GetMapping("/v1/reset_password/{userId}")
     public ResponseEntity resetPassword(@PathVariable String userId) {
        var result = userService.resetPassword(userId);
        if (result.getCode() == 200){
@@ -79,5 +79,11 @@ public class UserController {
        }
        result.setData(null);
        return ResponseEntity.status(result.getCode()).body(result);
+    }
+
+    @GetMapping("/v1/activate/{userId}")
+    public ResponseEntity activateUser(@PathVariable String userId){
+        var result = userService.activateUser(userId);
+        return ResponseEntity.status(result.getCode()).body(result);
     }
 }

@@ -42,7 +42,8 @@ public class SecurityConfig {
                 .requestMatchers(
                                 "api/v1/upload/gcp",
                                 "/api",
-                                "/api/reset_password/**",
+                                "/api/v1/reset_password/**",
+                                "/api/v1/activate/**",
                                 "/api/v1/register",
                                 "/api/v1/auth/**",
                                 "/swagger-ui/**",
