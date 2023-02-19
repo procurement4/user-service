@@ -13,7 +13,7 @@ public class Email {
 
     @Value("${MAILGUN_API_KEY}")
     private String API_KEY;
-    private static final String YOUR_DOMAIN_NAME = "sandboxaec436ed657344a482a27d8331f04d02.mailgun.org";
+    private static final String YOUR_DOMAIN_NAME = "sandboxe7007ff8635d4b6b9a39afa78ee86ea9.mailgun.org";
 
     public boolean sendEmailResetPassword(ResetPasswordRequest request){
         try {
