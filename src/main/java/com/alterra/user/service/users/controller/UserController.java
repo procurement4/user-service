@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api")
 //@RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 public class UserController {
     private static final String API_KEY = "3f7afc6d1e818f8646ea5363a29c9541-ca9eeb88-8fceec84";
     private static final String YOUR_DOMAIN_NAME = "procurement-capstone.site";
