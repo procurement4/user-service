@@ -14,6 +14,15 @@ public class Application {
 		return new ModelMapper();
 	}
 
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**");
+			}
+		};
+	}
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
