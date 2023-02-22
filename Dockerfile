@@ -1,4 +1,5 @@
 FROM gradle:jdk17-alpine as compile
+COPY /root/application_default_credentials.json /home/source/java
 COPY . /home/source/java
 WORKDIR /home/source/java
 # Default gradle user is `gradle`. We need to add permission on working directory for gradle to build.
