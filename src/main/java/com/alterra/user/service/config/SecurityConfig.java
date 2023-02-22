@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers(
-                                "api/v1/upload/gcp",
+                                "/api/v1/upload/gcp",
                                 "/api",
                                 "/api/v1/reset_password/**",
                                 "/api/v1/activate/**",
