@@ -182,12 +182,12 @@ public class UserServiceImpl implements UserService{
 
     public ResponseAPI saveImages(MultipartFile file){
         try {
-            Credentials credentials = GoogleCredentials
-                    .fromStream(new FileInputStream(GOOGLE_CREDENTIALS));
-            Storage storage = StorageOptions.newBuilder().setCredentials(credentials)
-                    .setProjectId(PROJECT_ID).build().getService();
+//            Credentials credentials = GoogleCredentials
+//                    .fromStream(new FileInputStream(GOOGLE_CREDENTIALS));
+//            Storage storage = StorageOptions.newBuilder().setCredentials(credentials)
+//                    .setProjectId(PROJECT_ID).build().getService();
 
-//            Storage storage = StorageOptions.getDefaultInstance().getService();
+            Storage storage = StorageOptions.getDefaultInstance().getService();
 
             String fileName = System.nanoTime() + "_" + file.getOriginalFilename();
             var isValidSize = fileUtils.checkImageSize(file);
