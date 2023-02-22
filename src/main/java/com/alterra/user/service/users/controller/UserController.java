@@ -1,5 +1,6 @@
 package com.alterra.user.service.users.controller;
 
+import com.alterra.user.service.users.model.ResetPasswordRequest;
 import com.alterra.user.service.users.model.UserRequest;
 import com.alterra.user.service.users.service.UserService;
 import com.google.gson.Gson;
@@ -73,9 +74,9 @@ public class UserController {
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
-    @GetMapping("/v1/reset_password/{userId}")
-    public ResponseEntity resetPassword(@PathVariable String userId) {
-       var result = userService.resetPassword(userId);
+    @PostMapping("/v1/reset_password")
+    public ResponseEntity resetPassword(@RequestBody ResetPasswordRequest request) {
+       var result = userService.resetPassword(request);
        if (result.getCode() == 200){
            kafkaTemplate.send("resetPassword", new Gson().toJson(result.getData()));
        }

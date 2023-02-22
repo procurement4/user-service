@@ -1,5 +1,6 @@
 package com.alterra.user.service.users.service;
 
+import com.alterra.user.service.users.model.ResetPasswordRequest;
 import com.alterra.user.service.utils.ResponseAPI;
 import com.alterra.user.service.users.entity.User;
 import com.alterra.user.service.users.model.UserRequest;
@@ -17,6 +18,6 @@ public interface UserService {
     ResponseAPI updateUser(UserRequest request);
     ResponseAPI uploadProfile(MultipartFile file);
     ResponseAPI saveImages(MultipartFile file);
-    ResponseAPI resetPassword(String userId);
+    ResponseAPI resetPassword(ResetPasswordRequest request);
     ResponseAPI activateUser(String userId);
 }

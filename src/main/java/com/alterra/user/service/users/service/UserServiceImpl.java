@@ -213,17 +213,17 @@ public class UserServiceImpl implements UserService{
         }
     }
 
-    public ResponseAPI resetPassword(String userId){
+    public ResponseAPI resetPassword(ResetPasswordRequest request){
         try {
-            var id = UUID.fromString(userId);
-            var getUserById = userRepositoryJPA.findById(id);
-            if (getUserById.isEmpty()) return responseAPI.INTERNAL_SERVER_ERROR("User not found", null);
+//            var id = UUID.fromString(userId);
+            var getUserByEmail = userRepositoryJPA.findByEmail(request.getEmail());
+            if (getUserByEmail == null) return responseAPI.INTERNAL_SERVER_ERROR("User not found", null);
             String newPassword = RandomStringUtils.randomAlphabetic(6);
             var resetPasswordRequest = new ResetPasswordRequest();
-            resetPasswordRequest.setUser_id(userId);
+            resetPasswordRequest.setUser_id(getUserByEmail.getId().toString());
             resetPasswordRequest.setNew_password(newPassword);
             resetPasswordRequest.setEmail("hendralw98@gmail.com");
-            userRepositoryJPA.resetPassword(passwordEncoder.encode(newPassword), new Date(), id);
+            userRepositoryJPA.resetPassword(passwordEncoder.encode(newPassword), new Date(), getUserByEmail.getId());
             return responseAPI.OK("Success reset password, please check your email at " + resetPasswordRequest.getEmail() , resetPasswordRequest);
         }catch (Exception ex){
             var errMsg = String.format("Error Message : %s with Stacktrace : %s",ex.getMessage(),ex.getStackTrace());
