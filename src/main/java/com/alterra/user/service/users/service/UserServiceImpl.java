@@ -187,6 +187,7 @@ public class UserServiceImpl implements UserService{
 //            Storage storage = StorageOptions.newBuilder().setCredentials(credentials)
 //                    .setProjectId(PROJECT_ID).build().getService();
 
+            //set GOOGLE_APPLICATION_CREDENTIALS=/root/.config/gcloud/application_default_credentials.json via GitHub Action Secret
             Storage storage = StorageOptions.getDefaultInstance().getService();
 
             String fileName = System.nanoTime() + "_" + file.getOriginalFilename();
