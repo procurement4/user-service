@@ -56,7 +56,7 @@ public class UserController {
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
-    @PatchMapping("/v1/users")
+    @PostMapping("/v1/users")
     public ResponseEntity updateUser(@RequestBody UserRequest request){
         var result = userService.updateUser(request);
         return ResponseEntity.status(result.getCode()).body(result);
